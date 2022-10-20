@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Cleanmate",
   "name": "cleanmate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Easily control you Cleanmate robot",
   "license": "Apache-2.0",
   "repository": {
