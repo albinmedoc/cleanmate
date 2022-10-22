@@ -1,6 +1,6 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/albinmedoc/cleanmate.svg)](https://github.com/albinmedoc/cleanmate)
 [![npm](https://img.shields.io/npm/v/cleanmate?label=npm%20package)](https://github.com/albinmedoc/cleanmate)
-[![npm](https://img.shields.io/npm/dt/cleanmate.svg)](https://www.npmjs.com/package/cleanmate)
+[![npm](https://img.shields.io/npm/dt/cleanmate)](https://www.npmjs.com/package/cleanmate)
 
 # Cleanmate
 Cleanmate is a popular robot vacuum cleaner in Sweden. This plugin allows you to control it from CLI or node.
