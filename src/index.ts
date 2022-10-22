@@ -6,8 +6,8 @@ import {
 } from './types';
 import type { CleanmateStatus } from './types';
 
+export default Cleanmate;
 export {
-  Cleanmate,
   WorkMode,
   WorkState,
   MopMode,
