@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Cleanmate",
   "name": "cleanmate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Easily control you Cleanmate robot",
   "license": "Apache-2.0",
   "repository": {
@@ -21,8 +21,7 @@
     "lint": "eslint src/**.ts --max-warnings=0",
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build",
-    "test": "jest",
-    "prepare": "husky install"
+    "test": "jest"
   },
   "keywords": [
     "cleanmate"
@@ -33,7 +32,6 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
-    "husky": "^8.0.0",
     "jest": "^29.1.2",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.0.3",

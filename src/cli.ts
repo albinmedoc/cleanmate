@@ -18,7 +18,7 @@ const args = arg({
 });
 
 if(args._.length === 0 && args['--version']){
-  console.log('1.0.0');
+  console.log('1.0.2');
   process.exit(0);
 }
 
