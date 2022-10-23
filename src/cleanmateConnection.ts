@@ -93,9 +93,6 @@ class CleanmateConnection {
     const request = JSON.stringify({
       version: '1.0',
       control: {
-        broadcast: '0',
-        targetType: '2',
-        targetId: 'C1F54FE0F16249689590EF3C6F04133B', // Looks like this can be anything with 32 characters
         authCode: this.authCode,
       },
       value,
