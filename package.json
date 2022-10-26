@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/jest": "^29.1.2",
     "@types/node": "^16.10.9",
+    "@types/python-struct": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
@@ -39,6 +40,8 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "arg": "^5.0.2"
+    "arg": "^5.0.2",
+    "canvas": "^2.10.1",
+    "python-struct": "^1.1.3"
   }
 }

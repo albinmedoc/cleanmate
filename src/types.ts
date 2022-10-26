@@ -26,13 +26,16 @@ export interface CleanmateStatus {
     volume: number;
 }
 
-export interface StatusResponse {
+interface BaseResponse {
     version: string;
     control: {
         targetId: string;
         targetType: string;
         broadcast: string;
     };
+}
+
+export interface StatusResponse extends BaseResponse {
     value: {
         noteCmd: string;
         voice: string;
@@ -56,4 +59,41 @@ export interface StatusResponse {
         mopMode: string;
         extParam: string;
     };
+}
+
+export interface MapResponse extends BaseResponse {
+  value: {
+    transitCmd: string;
+    result: string;
+    doTime: string;
+    mapType: string;
+    mapWidth: string;
+    mapHeight: string;
+    regionNum: string;
+    emptyMap: string;
+    blockSize: string;
+    isMove: string;
+    mapSign: string;
+    deg: string;
+    map: string;
+    trackTotal: string;
+    track: string;
+    adjoinRegion: string;
+    areaAdjoin: string;
+    chargerPos: string;
+    leftMaxPoint: string;
+    rightMaxPoint: string;
+    centerPoint: string;
+    clearArea: string;
+    clearTime: string;
+    clearModule: string;
+    clearSign: string;
+    pointArea: unknown;
+    cleanArea: unknown[];
+    forbiddenArea: unknown[];
+    mopForbiddenArea: unknown[];
+    regionNames: string;
+    robotPos: string;
+    virtualWall: unknown[];
+  };
 }
