@@ -22,10 +22,7 @@ describe('Status', () => {
   test('Can poll status', (done) => {
     const spy = jest.spyOn(CleanmateService.prototype as never, 'sendRequest').mockResolvedValue(null as never);
     cleanmateService.pollStatus().then(() => {
-      const buffer = Buffer.from('bf000000fa00000001000000c5270000010000007b2276657273696f6e223a22312e30222c22636f6e74726f6c223a7b2262726' +
-      'f616463617374223a2230222c2274617267657454797065223a2232222c227461726765744964223a2243314635344645304631363234393638393539304546334' +
-      '33646303431333342222c2261757468436f6465223a224142434445464748494a227d2c2276616c7565223a7b227374617465223a22222c227472616e736974436' +
-      'd64223a223938227d7d', 'hex');
+      const buffer = Buffer.from(Constants.POLL_STATUS_CMD, 'hex');
       expect(spy).toBeCalledTimes(1);
       expect(spy).toBeCalledWith(buffer);
       done();
