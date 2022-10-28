@@ -62,38 +62,43 @@ export interface StatusResponse extends BaseResponse {
 }
 
 export interface MapResponse extends BaseResponse {
-  value: {
-    transitCmd: string;
-    result: string;
-    doTime: string;
-    mapType: string;
-    mapWidth: string;
-    mapHeight: string;
-    regionNum: string;
-    emptyMap: string;
-    blockSize: string;
-    isMove: string;
-    mapSign: string;
-    deg: string;
-    map: string;
-    trackTotal: string;
-    track: string;
-    adjoinRegion: string;
-    areaAdjoin: string;
-    chargerPos: string;
-    leftMaxPoint: string;
-    rightMaxPoint: string;
-    centerPoint: string;
-    clearArea: string;
-    clearTime: string;
-    clearModule: string;
-    clearSign: string;
-    pointArea: unknown;
-    cleanArea: unknown[];
-    forbiddenArea: unknown[];
-    mopForbiddenArea: unknown[];
-    regionNames: string;
-    robotPos: string;
-    virtualWall: unknown[];
-  };
+    value: {
+        transitCmd: number;
+        result: number;
+        doTime: number;
+        mapType: number;
+        mapWidth: number;
+        mapHeight: number;
+        regionNum: number;
+        emptyMap: number;
+        blockSize: number;
+        isMove: number;
+        mapSign: number;
+        deg: number;
+        map: string;
+        trackTotal: number;
+        track: string;
+        adjoinRegion: [number, number][];
+        areaAdjoin: [number, number][];
+        chargerPos: [number, number];
+        leftMaxPoint: [number, number];
+        rightMaxPoint: [number, number];
+        centerPoint: [number, number];
+        clearArea: number;
+        clearTime: number;
+        clearModule: number;
+        clearSign: string;
+        pointArea: Record<string, unknown>;
+        cleanArea: unknown[];
+        forbiddenArea: unknown[];
+        mopForbiddenArea: unknown[];
+        regionNames: {
+            regionNum: number;
+            regionName: string;
+            cleanNum: number;
+            areaRect: [[number, number], [number, number]];
+        }[];
+        robotPos: [number, number];
+        virtualWall: unknown[];
+    };
 }
