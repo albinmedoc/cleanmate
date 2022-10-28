@@ -59,7 +59,7 @@ describe('Status', () => {
       expect(cleanmateService.workMode).toEqual(WorkMode.Intensive);
       expect(cleanmateService.workState).toEqual(WorkState.Cleaning);
       expect(cleanmateService.mopMode).toEqual(MopMode.High);
-      expect(cleanmateService.volume).toEqual(0);
+      expect(cleanmateService.volume).toEqual(20);
       done();
     });
 

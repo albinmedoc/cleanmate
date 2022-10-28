@@ -1,6 +1,7 @@
 import events from 'events';
 import { WorkMode, CleanmateStatus, StatusResponse, WorkState, MopMode } from './types';
 import CleanmateConnection from './cleanmateConnection';
+import { stringToObject } from './helpers';
 
 class CleanmateService extends CleanmateConnection {
   public events: events;
@@ -131,23 +132,15 @@ class CleanmateService extends CleanmateConnection {
     return this.events.removeListener(eventName, listener as (...args: unknown[]) => void);
   }
 
-  private tryParseInt(str: string): number {
-    const int = parseInt(str);
-    if(isNaN(int)) {
-      throw new TypeError('String is not an number');
-    }
-    return int;
-  }
-
   private onStatusResponse(data: Buffer) {
     try {
-      const response: StatusResponse = JSON.parse(data.toString('ascii'));
-      this.batteryLevel = this.tryParseInt(response.value.battery);
+      const response: StatusResponse = stringToObject<StatusResponse>(data.toString('ascii'));
+      this.batteryLevel = response.value.battery;
       this.version = response.value.version;
-      this.workMode = this.tryParseInt(response.value.workMode);
-      this.workState = this.tryParseInt(response.value.workState);
-      this.mopMode = this.tryParseInt(response.value.waterTank);
-      this.volume = this.mapToVolume(this.tryParseInt(response.value.voice));
+      this.workMode = response.value.workMode;
+      this.workState = response.value.workState;
+      this.mopMode = response.value.waterTank;
+      this.volume = this.mapToVolume(response.value.voice);
 
       this.events.emit('statusChange', this.status);
     } catch (err) {

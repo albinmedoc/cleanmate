@@ -26,34 +26,49 @@ export interface CleanmateStatus {
     volume: number;
 }
 
-export interface StatusResponse {
-    version: string;
+interface BaseResponse {
+    version: number;
     control: {
-        targetId: string;
-        targetType: string;
-        broadcast: string;
+        targetId: number;
+        targetType: number;
+        broadcast: number;
     };
+}
+
+export interface StatusResponse extends BaseResponse {
     value: {
-        noteCmd: string;
-        voice: string;
-        workState: string;
-        workMode: string;
-        fan: string;
-        direction: string;
-        brush: string;
-        battery: string;
-        error: string;
-        standbyMode: string;
-        waterTank: string;
-        clearComponent: string;
-        waterMark: string;
-        attract: string;
+        noteCmd: number;
+        voice: number;
+        workState: number;
+        workMode: number;
+        fan: number;
+        direction: number;
+        brush: number;
+        battery: number;
+        error: number;
+        standbyMode: number;
+        waterTank: number;
+        clearComponent: number;
+        waterMark: number;
+        attract: number;
         deviceIp: string;
-        devicePort: string;
-        carpetColor: string;
+        devicePort: number;
+        carpetColor: number;
         version: string;
-        result: string;
-        mopMode: string;
-        extParam: string;
+        result: number;
+        mopMode: number;
+        extParam: {
+            useVoiceSign: string;
+            uvSwitch: number;
+            upVoiceSign: unknown;
+            existVoiceSign: string;
+            cleanModule: number;
+            mapUpdateSign: number;
+            hadWork: number;
+            openRegion: number;
+            carpetpressure: number;
+            relocaNotice: number;
+            regionSign: unknown;
+        };
     };
 }
