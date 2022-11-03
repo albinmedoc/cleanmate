@@ -30,8 +30,8 @@ interface BaseResponse {
     version: string;
     control: {
         targetId: string;
-        targetType: string;
-        broadcast: string;
+        targetType: number;
+        broadcast: number;
     };
 }
 
@@ -61,6 +61,15 @@ export interface StatusResponse extends BaseResponse {
     };
 }
 
+export type Point = [number, number];
+
+export interface Region {
+    regionNum: number;
+    regionName: string;
+    cleanNum: number;
+    areaRect: [Point, Point];
+}
+
 export interface MapResponse extends BaseResponse {
     value: {
         transitCmd: number;
@@ -78,12 +87,12 @@ export interface MapResponse extends BaseResponse {
         map: string;
         trackTotal: number;
         track: string;
-        adjoinRegion: [number, number][];
-        areaAdjoin: [number, number][];
-        chargerPos: [number, number];
-        leftMaxPoint: [number, number];
-        rightMaxPoint: [number, number];
-        centerPoint: [number, number];
+        adjoinRegion: Point[];
+        areaAdjoin: Point[];
+        chargerPos: Point;
+        leftMaxPoint: Point;
+        rightMaxPoint: Point;
+        centerPoint: Point;
         clearArea: number;
         clearTime: number;
         clearModule: number;
@@ -92,13 +101,8 @@ export interface MapResponse extends BaseResponse {
         cleanArea: unknown[];
         forbiddenArea: unknown[];
         mopForbiddenArea: unknown[];
-        regionNames: {
-            regionNum: number;
-            regionName: string;
-            cleanNum: number;
-            areaRect: [[number, number], [number, number]];
-        }[];
-        robotPos: [number, number];
+        regionNames: Region[];
+        robotPos: Point;
         virtualWall: unknown[];
     };
 }
