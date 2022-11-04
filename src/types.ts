@@ -75,39 +75,41 @@ export interface Region {
     areaRect: [Point, Point];
 }
 
+export interface MapData {
+    transitCmd: number;
+    result: number;
+    doTime: number;
+    mapType: number;
+    mapWidth: number;
+    mapHeight: number;
+    regionNum: number;
+    emptyMap: number;
+    blockSize: number;
+    isMove: number;
+    mapSign: number;
+    deg: number;
+    map: string;
+    trackTotal: number;
+    track: string;
+    adjoinRegion: Point[];
+    areaAdjoin: Point[];
+    chargerPos: Point;
+    leftMaxPoint: Point;
+    rightMaxPoint: Point;
+    centerPoint: Point;
+    clearArea: number;
+    clearTime: number;
+    clearModule: number;
+    clearSign: string;
+    pointArea: Record<string, unknown>;
+    cleanArea: unknown[];
+    forbiddenArea: unknown[];
+    mopForbiddenArea: unknown[];
+    regionNames: Region[];
+    robotPos: Point;
+    virtualWall: unknown[];
+}
+
 export interface MapResponse extends BaseResponse {
-    value: {
-        transitCmd: number;
-        result: number;
-        doTime: number;
-        mapType: number;
-        mapWidth: number;
-        mapHeight: number;
-        regionNum: number;
-        emptyMap: number;
-        blockSize: number;
-        isMove: number;
-        mapSign: number;
-        deg: number;
-        map: string;
-        trackTotal: number;
-        track: string;
-        adjoinRegion: Point[];
-        areaAdjoin: Point[];
-        chargerPos: Point;
-        leftMaxPoint: Point;
-        rightMaxPoint: Point;
-        centerPoint: Point;
-        clearArea: number;
-        clearTime: number;
-        clearModule: number;
-        clearSign: string;
-        pointArea: Record<string, unknown>;
-        cleanArea: unknown[];
-        forbiddenArea: unknown[];
-        mopForbiddenArea: unknown[];
-        regionNames: Region[];
-        robotPos: Point;
-        virtualWall: unknown[];
-    };
+    value: MapData;
 }

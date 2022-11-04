@@ -1,17 +1,17 @@
 import fs from 'fs';
 import struct from 'python-struct';
 import { createCanvas, Canvas, CanvasRenderingContext2D, JPEGStream, PNGStream } from 'canvas';
-import { MapResponse, Point } from './types';
+import { MapData, Point } from './types';
 
 export type Color = string | CanvasGradient | CanvasPattern;
 
 class CleanmateMap {
-  private mapData: MapResponse;
+  private mapData: MapData;
   private canvas: Canvas;
   private ctx: CanvasRenderingContext2D;
   private scale: number;
 
-  constructor(mapData: MapResponse, scale=1) {
+  constructor(mapData: MapData, scale=1) {
     this.mapData = mapData;
     this.scale = scale;
     this.canvas = createCanvas(this.mapWidth*this.scale, this.mapHeight*this.scale);
@@ -22,21 +22,21 @@ class CleanmateMap {
   * The width of the map
   */
   private get mapWidth(): number {
-    return this.mapData.value.mapWidth;
+    return this.mapData.mapWidth;
   }
 
   /**
   * The height of the map
   */
   private get mapHeight(): number {
-    return this.mapData.value.mapHeight;
+    return this.mapData.mapHeight;
   }
 
   /**
   * The postion of the robot
   */
   private get robotPosition(): Point {
-    return this.mapData.value.robotPos;
+    return this.mapData.robotPos;
   }
 
   /**
@@ -88,7 +88,7 @@ class CleanmateMap {
     lineWidth: number = 1,
     color: Color = 'orange',
   ): void {
-    const buffer = Buffer.from(this.mapData.value.track, 'base64');
+    const buffer = Buffer.from(this.mapData.track, 'base64');
     const data = struct.unpack('<' + 'b'.repeat(buffer.length - 4), buffer.slice(4));
     this.ctx.lineWidth = lineWidth;
     this.ctx.beginPath();
@@ -134,7 +134,7 @@ class CleanmateMap {
     ],
   ): void {
     let index = 0;
-    this.mapData.value.regionNames.forEach((region) => {
+    this.mapData.regionNames.forEach((region) => {
       const x = region.areaRect[0][0] *this.scale;
       const y = region.areaRect[0][1] *this.scale;
       const width = (region.areaRect[1][0]*this.scale) - x;
@@ -179,7 +179,7 @@ class CleanmateMap {
     size: number = 5,
     color: Color = 'green',
   ): void {
-    this.drawPoint(this.mapData.value.chargerPos, size, color);
+    this.drawPoint(this.mapData.chargerPos, size, color);
   }
 
   private drawPoint(

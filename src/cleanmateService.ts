@@ -1,7 +1,6 @@
 import type events from 'events';
-import { WorkMode, Status, StatusResponse, WorkState, MopMode } from './types';
+import { WorkMode, Status, StatusResponse, WorkState, MopMode, MapResponse, MapData } from './types';
 import CleanmateConnection from './cleanmateConnection';
-import { stringToObject } from './helpers';
 
 class CleanmateService extends CleanmateConnection {
 
@@ -9,7 +8,7 @@ class CleanmateService extends CleanmateConnection {
 
   constructor(ipAddress: string, authCode: string, pollInterval: number = 0) {
     super(ipAddress, authCode);
-    this.client.on('data', this.onStatusResponse.bind(this));
+    this.events.on('data', this.onResponse.bind(this));
 
     if(pollInterval) {
       setInterval(() => {
@@ -78,6 +77,7 @@ class CleanmateService extends CleanmateConnection {
   public addListener(eventName: 'mopModeChange', listener: (mopMode: MopMode) => void): events;
   public addListener(eventName: 'volumeChange', listener: (volume: number) => void): events;
   public addListener(eventName: 'statusChange', listener: (status: Status) => void): events;
+  public addListener(eventName: 'mapChange', listener: (data: MapData) => void): events;
   public addListener(eventName: string, listener: (...args: never[]) => void): events {
     return this.events.addListener(eventName, listener as (...args: unknown[]) => void);
   }
@@ -89,16 +89,19 @@ class CleanmateService extends CleanmateConnection {
   public removeListener(eventName: 'mopModeChange', listener: (mopMode: MopMode) => void): events;
   public removeListener(eventName: 'volumeChange', listener: (volume: number) => void): events;
   public removeListener(eventName: 'statusChange', listener: (status: Status) => void): events;
+  public removeListener(eventName: 'mapChange', listener: (data: MapData) => void): events;
   public removeListener(eventName: string, listener: (...args: never[]) => void): events {
     return this.events.removeListener(eventName, listener as (...args: unknown[]) => void);
   }
 
-  private onStatusResponse(data: Buffer) {
-    try {
-      const response: StatusResponse = stringToObject<StatusResponse>(data.toString('ascii'));
+  private onResponse(response: StatusResponse | MapResponse) {
+    const isStatus = (response: StatusResponse | MapResponse): response is StatusResponse => {
+      return (response as StatusResponse).value.workMode !== undefined;
+    };
+    if(isStatus(response)) {
       this.updateStatus(response.value);
-    } catch (err) {
-      // This should not happen
+    } else {
+      this.events.emit('mapChange', response.value);
     }
   }
 
@@ -121,8 +124,11 @@ class CleanmateService extends CleanmateConnection {
     if(status.voice !== this.status?.voice) {
       this.events.emit('volumeChange', this.mapToVolume(status.voice));
     }
+    const statusChanged = this.status !== status;
     this.status = status;
-    this.events.emit('statusChange', status);
+    if(statusChanged) {
+      this.events.emit('statusChange', status);
+    }
   }
 
   /**
