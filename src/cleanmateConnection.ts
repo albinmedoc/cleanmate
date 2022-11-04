@@ -1,8 +1,11 @@
+import events from 'events';
 import net from 'net';
+import { stringToObject } from './helpers';
 
 class CleanmateConnection {
   public ipAddress: string;
   public authCode: string;
+  public events: events;
 
   protected client: net.Socket;
 
@@ -10,11 +13,16 @@ class CleanmateConnection {
   private connected = false;
   private keepAlive = false;
   private connectPromise?: Promise<void>;
+  private packets: Buffer[] = [];
+  private packetsSize?: number;
 
   constructor(ipAddress: string, authCode: string) {
     this.ipAddress = ipAddress;
     this.authCode = authCode;
+    this.events = new events.EventEmitter();
     this.client = new net.Socket();
+
+    this.client.on('data', this.onData.bind(this));
 
     this.client.on('close', () => {
       this.connected = false;
@@ -22,6 +30,55 @@ class CleanmateConnection {
         this.onConnectionLost();
       }
     });
+  }
+
+  private onData(data: Buffer) {
+    let packet: Buffer | undefined;
+    if(this.isLeadingPacket(data)) {
+      this.packetsSize = this.getSizeOfFullPacket(data);
+      this.packets.push(data);
+      return;
+    } else {
+      this.packets.push(data);
+      if(this.packetsSize) {
+        const packetsSoFar = Buffer.concat(this.packets);
+        const currentLength = packetsSoFar.length;
+        if(this.packetsSize === currentLength) {
+          packet = packetsSoFar.subarray(20);
+          this.packets = [];
+          this.packetsSize = undefined;
+        } else {
+          return;
+        }
+      } else {
+        packet = data;
+      }
+    }
+    // Here we have a full packet
+    try {
+      const objString = packet.toString('ascii');
+      const obj = stringToObject(objString);
+      this.events.emit('data', obj);
+    } catch(err) {
+      return;
+    }
+  }
+
+  private isLeadingPacket(data: Buffer): boolean {
+    const check = data.subarray(4, 12);
+    const validator = Buffer.from('+gAAAAEAAAA=', 'base64');
+    return Buffer.compare(check, validator) === 0;
+  }
+
+  private getSizeOfFullPacket(data: Buffer): number {
+    const header = data.subarray(0, 20).toString('hex');
+    const sizeHex = header.split('00')[0];
+    let sizeString = '';
+    for(let i = sizeHex.length - 1; i > 0; i-=2) {
+      sizeString += sizeHex[i-1] + sizeHex[i];
+    }
+    const size = parseInt(sizeString, 16);
+    return size;
   }
 
   private onConnectionLost() {

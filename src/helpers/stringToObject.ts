@@ -22,7 +22,7 @@ const reviver = (_key: string, value: any): any => {
 };
 
 const stringToObject = <T>(str: string): T => {
-  const formatted = str.replace(/"{/g, '{').replace(/}"/g, '}').replace(/\\"/g, '"');
+  const formatted = str.replace(/"{/g, '{').replace(/}"/g, '}').replace(/"\[/g, '[').replace(/\]"/g, ']').replace(/\\"/g, '"');
   return JSON.parse(formatted, reviver);
 };
 

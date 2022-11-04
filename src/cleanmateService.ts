@@ -1,16 +1,14 @@
-import events from 'events';
+import type events from 'events';
 import { WorkMode, Status, StatusResponse, WorkState, MopMode } from './types';
 import CleanmateConnection from './cleanmateConnection';
 import { stringToObject } from './helpers';
 
 class CleanmateService extends CleanmateConnection {
-  public events: events;
 
   private status?: Status;
 
   constructor(ipAddress: string, authCode: string, pollInterval: number = 0) {
     super(ipAddress, authCode);
-    this.events = new events.EventEmitter();
     this.client.on('data', this.onStatusResponse.bind(this));
 
     if(pollInterval) {
@@ -135,6 +133,22 @@ class CleanmateService extends CleanmateConnection {
     const request = this.makeRequest({
       state: '',
       transitCmd: '98',
+    });
+    return this.sendRequest(request);
+  }
+
+  /**
+  * Send a request to get information about the map.
+  * If you want to act on the response, make sure you have registered a event listener using the {@link addListener} function.
+  */
+  public pollMap(): Promise<void> {
+    const request = this.makeRequest({
+      mapWidth: '0',
+      centerPoint: '0',
+      mapHeight: '0',
+      trackNum: 'AAA=',
+      mapSign: 'AAA=',
+      transitCmd: '133',
     });
     return this.sendRequest(request);
   }
