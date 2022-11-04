@@ -1,3 +1,5 @@
+import { MopMode, Status, WorkMode, WorkState } from '../src/types';
+
 class Constants {
   IP_ADDRESS = '127.0.0.1';
   AUTH_CODE = 'ABCDEFGHIJ';
@@ -51,6 +53,42 @@ class Constants {
 
   FIND_CMD = '70000000fa00000001000000c5270000010000007b2276657273696f6e223a22312e30222c22636f6e74726f6c223a7b2261757468436f6465223a22414' +
   '2434445464748494a227d2c2276616c7565223a7b2266696e64223a22222c227472616e736974436d64223a22313433227d7d';
+
+  BASE_STATUS: Status = {
+    noteCmd: 1,
+    voice: 1,
+    workState: WorkState.Charging,
+    workMode: WorkMode.Standard,
+    fan: 0,
+    direction: 0,
+    brush: 0,
+    battery: 100,
+    error: 0,
+    standbyMode: 0,
+    waterTank: MopMode.Medium,
+    clearComponent: 1,
+    waterMark: 0,
+    attract: 0,
+    deviceIp: '192.168.1.11',
+    devicePort: 8888,
+    carpetColor: 1,
+    version: '5.11',
+    result: 0,
+    mopMode: 1,
+    extParam: {
+      useVoiceSign: 'en',
+      uvSwitch: -1,
+      upVoiceSign: '',
+      existVoiceSign: 'en',
+      cleanModule: 1,
+      mapUpdateSign: 0,
+      hadWork: 0,
+      openRegion: 1,
+      carpetpressure: 0,
+      relocaNotice: 0,
+      regionSign: '',
+    },
+  };
 }
 
 export default new Constants();

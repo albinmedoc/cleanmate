@@ -17,13 +17,40 @@ export enum MopMode {
     Low = 60
 }
 
-export interface CleanmateStatus {
-    batteryLevel: number;
-    version: string;
-    workMode: WorkMode;
+export interface Status {
+    noteCmd: number;
+    voice: number;
     workState: WorkState;
-    mopMode: MopMode;
-    volume: number;
+    workMode: WorkMode;
+    fan: number;
+    direction: number;
+    brush: number;
+    battery: number;
+    error: number;
+    standbyMode: number;
+    waterTank: MopMode;
+    clearComponent: number;
+    waterMark: number;
+    attract: number;
+    deviceIp: string;
+    devicePort: number;
+    carpetColor: number;
+    version: string;
+    result: number;
+    mopMode: number;
+    extParam: {
+        useVoiceSign: string;
+        uvSwitch: number;
+        upVoiceSign: unknown;
+        existVoiceSign: string;
+        cleanModule: number;
+        mapUpdateSign: number;
+        hadWork: number;
+        openRegion: number;
+        carpetpressure: number;
+        relocaNotice: number;
+        regionSign: unknown;
+    };
 }
 
 interface BaseResponse {
@@ -36,41 +63,7 @@ interface BaseResponse {
 }
 
 export interface StatusResponse extends BaseResponse {
-    value: {
-        noteCmd: number;
-        voice: number;
-        workState: number;
-        workMode: number;
-        fan: number;
-        direction: number;
-        brush: number;
-        battery: number;
-        error: number;
-        standbyMode: number;
-        waterTank: number;
-        clearComponent: number;
-        waterMark: number;
-        attract: number;
-        deviceIp: string;
-        devicePort: number;
-        carpetColor: number;
-        version: string;
-        result: number;
-        mopMode: number;
-        extParam: {
-            useVoiceSign: string;
-            uvSwitch: number;
-            upVoiceSign: unknown;
-            existVoiceSign: string;
-            cleanModule: number;
-            mapUpdateSign: number;
-            hadWork: number;
-            openRegion: number;
-            carpetpressure: number;
-            relocaNotice: number;
-            regionSign: unknown;
-        };
-    };
+    value: Status;
 }
 
 export type Point = [number, number];
