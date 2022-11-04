@@ -1,6 +1,6 @@
 import Constants from './constants';
 import CleanmateService from '../src/cleanmateService';
-import { MopMode, WorkMode, WorkState } from '../src/types';
+import { MopMode, Status, WorkMode, WorkState } from '../src/types';
 
 describe('Events', () => {
   let cleanmateService: CleanmateService;
@@ -12,12 +12,18 @@ describe('Events', () => {
     cleanmateService = new CleanmateService(Constants.IP_ADDRESS, Constants.AUTH_CODE);
   });
 
+  const updateStatus = <K extends keyof Status>(key: K, value: Status[K]) => {
+    const newStatus = Constants.BASE_STATUS;
+    newStatus[key] = value;
+    cleanmateService['updateStatus'](newStatus);
+  };
+
   test('Can remove event listener', () => {
     const callback = jest.fn();
 
     cleanmateService.addListener('batteryLevelChange', callback);
     cleanmateService.removeListener('batteryLevelChange', callback);
-    cleanmateService['batteryLevel'] = 0;
+    updateStatus('battery', 0);
     expect(callback).not.toBeCalled();
   });
 
@@ -28,7 +34,7 @@ describe('Events', () => {
       expect(value).toEqual(batteryLevel);
       done();
     });
-    cleanmateService['batteryLevel'] = batteryLevel;
+    updateStatus('battery', batteryLevel);
   });
 
   test('Triggers event when version changes', (done) => {
@@ -38,7 +44,7 @@ describe('Events', () => {
       expect(value).toEqual(version);
       done();
     });
-    cleanmateService['version'] = version;
+    updateStatus('version', version);
   });
 
   test('Triggers event when workMode changes', (done) => {
@@ -48,7 +54,7 @@ describe('Events', () => {
       expect(value).toEqual(workMode);
       done();
     });
-    cleanmateService['workMode'] = workMode;
+    updateStatus('workMode', workMode);
   });
 
   test('Triggers event when workState changes', (done) => {
@@ -58,7 +64,7 @@ describe('Events', () => {
       expect(value).toEqual(workState);
       done();
     });
-    cleanmateService['workState'] = workState;
+    updateStatus('workState', workState);
   });
 
   test('Triggers event when mopMode changes', (done) => {
@@ -68,16 +74,14 @@ describe('Events', () => {
       expect(value).toEqual(mopMode);
       done();
     });
-    cleanmateService['mopMode'] = mopMode;
+    updateStatus('waterTank', mopMode);
   });
 
   test('Triggers event when volume changes', (done) => {
-    const volume = 20;
-
     cleanmateService.addListener('volumeChange', (value) => {
-      expect(value).toEqual(volume);
+      expect(value).toEqual(20);
       done();
     });
-    cleanmateService['volume'] = volume;
+    updateStatus('voice', 1.2);
   });
 });

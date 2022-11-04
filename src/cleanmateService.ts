@@ -1,19 +1,12 @@
 import events from 'events';
-import { WorkMode, CleanmateStatus, StatusResponse, WorkState, MopMode } from './types';
+import { WorkMode, Status, StatusResponse, WorkState, MopMode } from './types';
 import CleanmateConnection from './cleanmateConnection';
 import { stringToObject } from './helpers';
 
 class CleanmateService extends CleanmateConnection {
   public events: events;
 
-  private status: CleanmateStatus = {
-    batteryLevel: 0,
-    version: '',
-    workMode: WorkMode.Standard,
-    workState: WorkState.Charging,
-    mopMode: MopMode.Medium,
-    volume: 2,
-  };
+  private status?: Status;
 
   constructor(ipAddress: string, authCode: string, pollInterval: number = 0) {
     super(ipAddress, authCode);
@@ -30,73 +23,43 @@ class CleanmateService extends CleanmateConnection {
   /**
   * The current battery level of the robot.
   */
-  public get batteryLevel(): number {
-    return this.status.batteryLevel || 0;
-  }
-
-  private set batteryLevel(value: number) {
-    this.events.emit('batteryLevelChange', value);
-    this.status.batteryLevel = value;
+  public get batteryLevel(): number | undefined {
+    return this.status?.battery;
   }
 
   /**
   * The current version of the robot.
   */
-  public get version(): string {
-    return this.status.version;
-  }
-
-  private set version(value: string) {
-    this.events.emit('versionChange', value);
-    this.status.version = value;
+  public get version(): string | undefined {
+    return this.status?.version;
   }
 
   /**
   * The current {@link WorkMode} of the robot.
   */
-  public get workMode(): WorkMode {
-    return this.status.workMode;
-  }
-
-  private set workMode(value: WorkMode) {
-    this.events.emit('workModeChange', value);
-    this.status.workMode = value;
+  public get workMode(): WorkMode | undefined {
+    return this.status?.workMode;
   }
 
   /**
   * The current {@link WorkState} of the robot.
   */
-  public get workState(): WorkState {
-    return this.status.workState;
-  }
-
-  private set workState(value: WorkState) {
-    this.events.emit('workStateChange', value);
-    this.status.workState = value;
+  public get workState(): WorkState | undefined {
+    return this.status?.workState;
   }
 
   /**
   * The current {@link MopMode} of the robot.
   */
-  public get mopMode(): MopMode {
-    return this.status.mopMode;
-  }
-
-  private set mopMode(value: MopMode) {
-    this.events.emit('mopModeChange', value);
-    this.status.mopMode = value;
+  public get mopMode(): MopMode | undefined {
+    return this.status?.waterTank;
   }
 
   /**
   * The current volume level of the robot.
   */
-  public get volume(): number {
-    return this.status.volume;
-  }
-
-  private set volume(value: number) {
-    this.events.emit('volumeChange', value);
-    this.status.volume = value;
+  public get volume(): number| undefined {
+    return this.status?.voice ? Math.round((this.status.voice - 1) * 100): undefined;
   }
 
   /**
@@ -116,7 +79,7 @@ class CleanmateService extends CleanmateConnection {
   public addListener(eventName: 'workStateChange', listener: (workState: WorkState) => void): events;
   public addListener(eventName: 'mopModeChange', listener: (mopMode: MopMode) => void): events;
   public addListener(eventName: 'volumeChange', listener: (volume: number) => void): events;
-  public addListener(eventName: 'statusChange', listener: (status: CleanmateStatus) => void): events;
+  public addListener(eventName: 'statusChange', listener: (status: Status) => void): events;
   public addListener(eventName: string, listener: (...args: never[]) => void): events {
     return this.events.addListener(eventName, listener as (...args: unknown[]) => void);
   }
@@ -127,7 +90,7 @@ class CleanmateService extends CleanmateConnection {
   public removeListener(eventName: 'workStateChange', listener: (workState: WorkState) => void): events;
   public removeListener(eventName: 'mopModeChange', listener: (mopMode: MopMode) => void): events;
   public removeListener(eventName: 'volumeChange', listener: (volume: number) => void): events;
-  public removeListener(eventName: 'statusChange', listener: (status: CleanmateStatus) => void): events;
+  public removeListener(eventName: 'statusChange', listener: (status: Status) => void): events;
   public removeListener(eventName: string, listener: (...args: never[]) => void): events {
     return this.events.removeListener(eventName, listener as (...args: unknown[]) => void);
   }
@@ -135,17 +98,33 @@ class CleanmateService extends CleanmateConnection {
   private onStatusResponse(data: Buffer) {
     try {
       const response: StatusResponse = stringToObject<StatusResponse>(data.toString('ascii'));
-      this.batteryLevel = response.value.battery;
-      this.version = response.value.version;
-      this.workMode = response.value.workMode;
-      this.workState = response.value.workState;
-      this.mopMode = response.value.waterTank;
-      this.volume = this.mapToVolume(response.value.voice);
-
-      this.events.emit('statusChange', this.status);
+      this.updateStatus(response.value);
     } catch (err) {
       // This should not happen
     }
+  }
+
+  private updateStatus(status: Status): void {
+    if(status.battery !== this.status?.battery) {
+      this.events.emit('batteryLevelChange', status.battery);
+    }
+    if(status.version !== this.status?.version) {
+      this.events.emit('versionChange', status.version);
+    }
+    if(status.workMode !== this.status?.workMode) {
+      this.events.emit('workModeChange', status.workMode);
+    }
+    if(status.workState !== this.status?.workState) {
+      this.events.emit('workStateChange', status.workState);
+    }
+    if(status.waterTank !== this.status?.waterTank) {
+      this.events.emit('mopModeChange', status.waterTank);
+    }
+    if(status.voice !== this.status?.voice) {
+      this.events.emit('volumeChange', this.mapToVolume(status.voice));
+    }
+    this.status = status;
+    this.events.emit('statusChange', status);
   }
 
   /**
@@ -172,16 +151,13 @@ class CleanmateService extends CleanmateConnection {
         mode: workMode.toString(),
         transitCmd: '106',
       });
-      this.status.workMode = workMode;
     } else {
       request = this.makeRequest({
         start: '1',
         transitCmd: '100',
       });
     }
-    return this.sendRequest(request).then(() => {
-      this.status.workState = WorkState.Cleaning;
-    });
+    return this.sendRequest(request);
 
   }
 
@@ -194,9 +170,7 @@ class CleanmateService extends CleanmateConnection {
       isStop: '0',
       transitCmd: '102',
     });
-    return this.sendRequest(request).then(() => {
-      this.status.workState = WorkState.Paused;
-    });
+    return this.sendRequest(request);
   }
 
   /**
@@ -220,9 +194,7 @@ class CleanmateService extends CleanmateConnection {
       waterTank: mopMode.toString(),
       transitCmd: '145',
     });
-    return this.sendRequest(request).then(() => {
-      this.status.mopMode = mopMode;
-    });
+    return this.sendRequest(request);
   }
 
   private mapToVolume(value: number): number {
@@ -248,9 +220,7 @@ class CleanmateService extends CleanmateConnection {
       voice: '',
       transitCmd: '123',
     });
-    return this.sendRequest(request).then(() => {
-      this.status.volume = volume;
-    });
+    return this.sendRequest(request);
   }
 
   /**
@@ -268,9 +238,7 @@ class CleanmateService extends CleanmateConnection {
       'opCmd': 'cleanBlocks',
       cleanBlocks,
     });
-    return this.sendRequest(request).then(() => {
-      this.workState = WorkState.Cleaning;
-    });
+    return this.sendRequest(request);
   }
 
   /**
