@@ -2,13 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import struct from 'python-struct';
 import { createCanvas, Canvas, CanvasRenderingContext2D, JPEGStream, PNGStream, loadImage, Image } from 'canvas';
-import { MapData, Point } from './types';
+import { MapData, Point, Region } from './types';
 
 export type Color = string | CanvasGradient | CanvasPattern;
 
 class CleanmateMap {
+  public canvas: Canvas;
+
   private mapData: MapData;
-  private canvas: Canvas;
   private ctx: CanvasRenderingContext2D;
   private scale: number;
 
@@ -17,6 +18,42 @@ class CleanmateMap {
     this.scale = scale;
     this.canvas = createCanvas(mapData.mapWidth*this.scale, mapData.mapHeight*this.scale);
     this.ctx = this.canvas.getContext('2d');
+  }
+
+  /**
+  * The map regions/rooms
+  */
+  public get regions(): Region[] {
+    return this.mapData.regionNames;
+  }
+
+  /**
+  * The robot path, a list of points
+  */
+  public get track(): Point[] {
+    const buffer = Buffer.from(this.mapData.track, 'base64');
+    const data = struct.unpack('<' + 'b'.repeat(buffer.length - 4), buffer.slice(4));
+    const path: Point[] = [];
+    for(let i = 4; i < data.length-1; i+=4) {
+      const x = this.mapData.centerPoint[0] - 100 + (data[i].valueOf() as number);
+      const y = this.mapData.centerPoint[1] + 30 + (data[i+2].valueOf() as number);
+      path.push([x, y]);
+    }
+    return path;
+  }
+
+  /**
+  * The current position of the robot
+  */
+  public get robotPos(): Point {
+    return this.mapData.robotPos;
+  }
+
+  /**
+  * The current position of the charger/dock
+  */
+  public get chargerPos(): Point {
+    return this.mapData.chargerPos;
   }
 
   /**
@@ -68,17 +105,9 @@ class CleanmateMap {
     lineWidth: number = 1,
     color: Color = 'orange',
   ): void {
-    const buffer = Buffer.from(this.mapData.track, 'base64');
-    const data = struct.unpack('<' + 'b'.repeat(buffer.length - 4), buffer.slice(4));
     this.ctx.lineWidth = lineWidth * this.scale;
     this.ctx.beginPath();
-    const path: Point[] = [];
-    for(let i = 4; i < data.length-1; i+=4) {
-      const x = this.mapData.centerPoint[0] - 100 + (data[i].valueOf() as number);
-      const y = this.mapData.centerPoint[1] + 30 + (data[i+2].valueOf() as number);
-      path.push([x, y]);
-    }
-    path.forEach((point) => {
+    this.track.forEach((point) => {
       const x = (point[0]) * this.scale;
       const y = (point[1]) * this.scale;
       this.ctx.lineTo(x, y);
@@ -110,7 +139,7 @@ class CleanmateMap {
     ],
   ): void {
     let index = 0;
-    this.mapData.regionNames.forEach((region) => {
+    this.regions.forEach((region) => {
       const x = region.areaRect[0][0] *this.scale;
       const y = region.areaRect[0][1] *this.scale;
       const width = (region.areaRect[1][0]*this.scale) - x;
@@ -142,7 +171,7 @@ class CleanmateMap {
     size: number = 5,
     icon: string = path.join(__dirname, './assets/vacuum-cleaner.svg'),
   ): Promise<void> {
-    return loadImage(icon).then((image) => this.drawImage(this.mapData.robotPos, size, this.mapData.deg, image));
+    return loadImage(icon).then((image) => this.drawImage(this.robotPos, size, this.mapData.deg, image));
   }
 
   /**
@@ -155,7 +184,7 @@ class CleanmateMap {
     size: number = 5,
     icon: string = path.join(__dirname, './assets/charger.svg'),
   ): Promise<void> {
-    return loadImage(icon).then((image) => this.drawImage(this.mapData.chargerPos, size, 0, image));
+    return loadImage(icon).then((image) => this.drawImage(this.chargerPos, size, 0, image));
   }
 
   private drawImage(
