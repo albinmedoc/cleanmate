@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import arg from 'arg';
+import path from 'path';
+import CleanmateMap from './cleanmateMap';
 import CleanmateService from './cleanmateService';
 
 const args = arg({
@@ -9,6 +11,11 @@ const args = arg({
   '--workMode': Number,
   '--mopMode': String,
   '--room': [Number],
+  '--regions': Boolean,
+  '--robot': Boolean,
+  '--charger': Boolean,
+  '--track': Boolean,
+  '--filename': String,
 
   // Aliases
   '-v': '--version',
@@ -34,7 +41,7 @@ const [ipAddress, authCode, cmd] = args._;
   '--port': port = 8888,
 } = args; */
 
-if(!['start', 'pause', 'charge', 'status', 'volume', 'find'].includes(cmd)) {
+if(!['start', 'pause', 'charge', 'status', 'volume', 'find', 'map'].includes(cmd)) {
   process.exit(1);
 }
 const cleanmateService = new CleanmateService(ipAddress, authCode);
@@ -71,6 +78,31 @@ cleanmateService.connect().then(() => {
       break;
     case 'find':
       promise = cleanmateService.findRobot();
+      break;
+    case 'map':
+      promise = new Promise((resolve, reject) => {
+        cleanmateService.addListener('mapChange', (mapData) => {
+          const map = new CleanmateMap(mapData);
+          if(args['--regions']) {
+            map.drawRegions();
+          }
+          if(args['--regions']) {
+            map.drawRegions();
+          }
+          if(args['--robot']) {
+            map.drawRobot();
+          }
+          if(args['--charger']) {
+            map.drawCharger();
+          }
+          if(args['--track']) {
+            map.drawTrack();
+          }
+          const fileName = args['--filename'] ?? path.join(process.cwd(), 'mapOutput.png');
+          map.exportMapAsPNG(fileName).then(() => resolve()).catch((err) => reject(err));
+        });
+        cleanmateService.pollMap().catch((err) => reject(err));
+      });
       break;
     default:
       break;
