@@ -14,10 +14,10 @@ const reviver = (_key: string, value: any): any => {
       }
     }
     const int = Number(value);
-    if(isNaN(int)) {
-      return value;
+    if(value.length && !isNaN(int)) {
+      return int;
     }
-    return int;
+    return value;
   }
 };
 

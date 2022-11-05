@@ -1,6 +1,7 @@
 import fs from 'fs';
+import path from 'path';
 import struct from 'python-struct';
-import { createCanvas, Canvas, CanvasRenderingContext2D, JPEGStream, PNGStream } from 'canvas';
+import { createCanvas, Canvas, CanvasRenderingContext2D, JPEGStream, PNGStream, loadImage, Image } from 'canvas';
 import { MapData, Point } from './types';
 
 export type Color = string | CanvasGradient | CanvasPattern;
@@ -11,32 +12,11 @@ class CleanmateMap {
   private ctx: CanvasRenderingContext2D;
   private scale: number;
 
-  constructor(mapData: MapData, scale=1) {
+  constructor(mapData: MapData, scale=5) {
     this.mapData = mapData;
     this.scale = scale;
-    this.canvas = createCanvas(this.mapWidth*this.scale, this.mapHeight*this.scale);
+    this.canvas = createCanvas(mapData.mapWidth*this.scale, mapData.mapHeight*this.scale);
     this.ctx = this.canvas.getContext('2d');
-  }
-
-  /**
-  * The width of the map
-  */
-  private get mapWidth(): number {
-    return this.mapData.mapWidth;
-  }
-
-  /**
-  * The height of the map
-  */
-  private get mapHeight(): number {
-    return this.mapData.mapHeight;
-  }
-
-  /**
-  * The postion of the robot
-  */
-  private get robotPosition(): Point {
-    return this.mapData.robotPos;
   }
 
   /**
@@ -90,21 +70,17 @@ class CleanmateMap {
   ): void {
     const buffer = Buffer.from(this.mapData.track, 'base64');
     const data = struct.unpack('<' + 'b'.repeat(buffer.length - 4), buffer.slice(4));
-    this.ctx.lineWidth = lineWidth;
+    this.ctx.lineWidth = lineWidth * this.scale;
     this.ctx.beginPath();
     const path: Point[] = [];
     for(let i = 4; i < data.length-1; i+=4) {
-      const x = this.mapWidth - Math.abs((data[i].valueOf() as number));
-      const y = this.mapHeight - Math.abs((data[i+2].valueOf() as number));
+      const x = this.mapData.centerPoint[0] - 100 + (data[i].valueOf() as number);
+      const y = this.mapData.centerPoint[1] + 30 + (data[i+2].valueOf() as number);
       path.push([x, y]);
     }
-    const pathRobotPos = path[path.length - 1];
-    const offsetX = pathRobotPos[0] - this.robotPosition[0];
-    const offsetY = pathRobotPos[1] - this.robotPosition[1];
-
     path.forEach((point) => {
-      const x = (point[0] - offsetX) * this.scale;
-      const y = (point[1] - offsetY) * this.scale;
+      const x = (point[0]) * this.scale;
+      const y = (point[1]) * this.scale;
       this.ctx.lineTo(x, y);
     });
 
@@ -164,9 +140,9 @@ class CleanmateMap {
   */
   public drawRobot(
     size: number = 5,
-    color: Color = 'blue',
-  ): void {
-    this.drawPoint(this.robotPosition, size, color);
+    icon: string = path.join(__dirname, './assets/vacuum-cleaner.svg'),
+  ): Promise<void> {
+    return loadImage(icon).then((image) => this.drawImage(this.mapData.robotPos, size, this.mapData.deg, image));
   }
 
   /**
@@ -177,21 +153,22 @@ class CleanmateMap {
   */
   public drawCharger(
     size: number = 5,
-    color: Color = 'green',
-  ): void {
-    this.drawPoint(this.mapData.chargerPos, size, color);
+    icon: string = path.join(__dirname, './assets/charger.svg'),
+  ): Promise<void> {
+    return loadImage(icon).then((image) => this.drawImage(this.mapData.chargerPos, size, 0, image));
   }
 
-  private drawPoint(
+  private drawImage(
     point: Point,
     size: number,
-    color: string | CanvasGradient | CanvasPattern,
+    deg: number,
+    image: Image,
   ): void {
-    this.ctx.beginPath();
-    this.ctx.arc(point[0]*this.scale, point[1]*this.scale, size/2, 0, 2 * Math.PI);
-    this.ctx.closePath();
-    this.ctx.fillStyle = color;
-    this.ctx.fill();
+    this.ctx.save();
+    this.ctx.translate(point[0]*this.scale, point[1]*this.scale);
+    this.ctx.rotate(deg);
+    this.ctx.drawImage(image, 0, 0, size*this.scale, size*this.scale);
+    this.ctx.restore();
   }
 }
 
