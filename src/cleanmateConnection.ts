@@ -89,6 +89,11 @@ class CleanmateConnection {
     }, 4000);
   }
 
+  /**
+  * Connect to the robot
+  *
+  * @returns {Promise<void>} A promise
+  */
   public connect(keepAlive: boolean = false): Promise<void> {
     this.keepAlive = keepAlive;
     if(!this.connectPromise) {
@@ -115,6 +120,11 @@ class CleanmateConnection {
     return this.connectPromise;
   }
 
+  /**
+  * Disconnect from the robot
+  *
+  * @returns {Promise<void>} A promise, always resolves
+  */
   public disconnect(): Promise<void> {
     return new Promise((resolve) => {
       if(!this.connected){
@@ -146,6 +156,13 @@ class CleanmateConnection {
     return out;
   }
 
+  /**
+  * Create a request with the specified data
+  *
+  * @param {Record<string, unknown>} [value] The data to send
+  *
+  * @returns {Buffer} The request buffer
+  */
   public makeRequest(value: Record<string, unknown>): Buffer {
     const request = JSON.stringify({
       version: '1.0',
@@ -162,7 +179,14 @@ class CleanmateConnection {
     return data;
   }
 
-  protected sendRequest(data: Buffer): Promise<void> {
+  /**
+  * Sends a request to the robot
+  *
+  * @param {Buffer} [data] The request to send
+  *
+  * @returns {Promise<void>} A promise
+  */
+  public sendRequest(data: Buffer): Promise<void> {
     return this.connect().then(() => new Promise((resolve, reject) => {
       this.client.write(data, (err) => {
         if(err) {
