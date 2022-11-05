@@ -102,12 +102,12 @@ export interface MapData {
     clearModule: number;
     clearSign: string;
     pointArea: Record<string, unknown>;
-    cleanArea: unknown[];
-    forbiddenArea: unknown[];
-    mopForbiddenArea: unknown[];
+    cleanArea: number | unknown[];
+    forbiddenArea: number | unknown[];
+    mopForbiddenArea: number | unknown[];
     regionNames: Region[];
     robotPos: Point;
-    virtualWall: unknown[];
+    virtualWall: number | unknown[];
 }
 
 export interface MapResponse extends BaseResponse {

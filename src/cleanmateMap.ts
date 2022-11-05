@@ -2,15 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import struct from 'python-struct';
 import { createCanvas, Canvas, CanvasRenderingContext2D, JPEGStream, PNGStream, loadImage, Image } from 'canvas';
-import { MapData, Point, Region } from './types';
+import type { MapData, Point, Region } from './types';
 
 export type Color = string | CanvasGradient | CanvasPattern;
 
 class CleanmateMap {
   public canvas: Canvas;
+  public ctx: CanvasRenderingContext2D;
 
   private mapData: MapData;
-  private ctx: CanvasRenderingContext2D;
   private scale: number;
 
   constructor(mapData: MapData, scale=5) {

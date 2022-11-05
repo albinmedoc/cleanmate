@@ -1,4 +1,4 @@
-import { MopMode, Status, WorkMode, WorkState } from '../src/types';
+import { Status, MapData, MopMode, WorkMode, WorkState } from '../src/types';
 
 class Constants {
   IP_ADDRESS = '127.0.0.1';
@@ -88,6 +88,60 @@ class Constants {
       relocaNotice: 0,
       regionSign: '',
     },
+  };
+
+  BASE_MAP_DATA: MapData = {
+    transitCmd: 134,
+    result: 0,
+    doTime: 1150453,
+    mapType: -1,
+    mapWidth: 700,
+    mapHeight: 700,
+    regionNum: 2,
+    emptyMap: 0,
+    blockSize: 1000,
+    isMove: 0,
+    mapSign: 1,
+    deg: 90,
+    map: '',
+    trackTotal: 1,
+    track: 'BAQAAAAAAgBwAT4BbgE+AQ==',
+    adjoinRegion: [],
+    areaAdjoin: [],
+    chargerPos: [365, 313],
+    leftMaxPoint: [90, 306],
+    rightMaxPoint: [626, 660],
+    centerPoint: [358, 483],
+    clearArea: 0,
+    clearTime: 0,
+    clearModule: 0,
+    clearSign: '2022-11-04-00-43-11-0',
+    pointArea: {},
+    cleanArea: 0,
+    forbiddenArea: 0,
+    mopForbiddenArea: 0,
+    regionNames: [
+      {
+        regionNum: 2,
+        regionName: '',
+        cleanNum: 0,
+        areaRect: [
+          [0, 1],
+          [2, 3],
+        ],
+      },
+      {
+        regionNum: 3,
+        regionName: '',
+        cleanNum: 0,
+        areaRect: [
+          [4, 5],
+          [6, 7],
+        ],
+      },
+    ],
+    robotPos: [365, 353],
+    virtualWall: 0,
   };
 }
 
